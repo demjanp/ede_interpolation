@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=EDE Interpolation
+qgisMinimumVersion=3.0
+description=Evidence Density Estimation (EDE) interpolation of archaeological settlement data.
+version=0.1
+author=Peter Demján
+email=peter.demjan@gmail.com
+
+about=Evidence Density Estimation (EDE) interpolation of archaeological settlement data. Produces spatio-temporal distribution maps or summed distributions representing intensity of settlement activities within the examined area in different time periods. Uses radiocarbon-dated as well as typo-chronologically dated evidence as input. For a detailed description see: Demján, P., & Dreslerová, D. (2016). Modelling distribution of archaeological settlement evidence based on heterogeneous spatial and temporal data. Journal of Archaeological Science, 69, 100–109. https://doi.org/10.1016/j.jas.2016.04.003
+
+tracker=http://bugs
+repository=http://repo
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=python
+
+homepage=http://homepage
+category=Plugins
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+

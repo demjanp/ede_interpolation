@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/ede_interpolation" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
