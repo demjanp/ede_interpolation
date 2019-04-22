@@ -34,20 +34,14 @@ from qgis.utils import iface
 
 from .ede_interpolation_process import EDEInterpolationProcess
 
-# This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-	os.path.dirname(__file__), 'ede_interpolation_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'ede_interpolation_dialog_base.ui'))
 
 class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 	
 	def __init__(self, parent=None):
-		"""Constructor."""
+		
 		super(EDEInterpolationDialog, self).__init__(parent)
-		# Set up the user interface from Designer through FORM_CLASS.
-		# After self.setupUi() you can access any designer object by doing
-		# self.<objectname>, and you can use autoconnect slots - see
-		# http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-		# #widgets-and-dialogs-with-auto-connect
+				
 		self.setupUi(self)
 		
 		self.combo_input_layer.setFilters(QgsMapLayerProxyModel.PointLayer)
@@ -64,7 +58,7 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 		self.combo_dating_type.setFilters(QgsFieldProxyModel.String)
 		for combo in [self.combo_sp_accuracy, self.combo_dating_mean, self.combo_dating_uncert, self.combo_dating_type]:
 			combo.fieldChanged.connect(self.on_field_changed)
-		for edit in [self.edit_duration, self.edit_diameter, self.edit_time_step, self.edit_cell_size]:
+		for edit in [self.edit_duration, self.edit_diameter, self.edit_time_step, self.edit_time_from, self.edit_time_to, self.edit_cell_size]:
 			edit.textEdited.connect(self.on_text_edited)
 		
 		self.combo_input_layer.layerChanged.connect(self.on_input_layer_changed)
@@ -111,6 +105,10 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			for edit in [self.edit_duration, self.edit_diameter, self.edit_time_step, self.edit_cell_size]:
 				if not check_number(edit.text()):
 					return False
+			for edit in [self.edit_time_from, self.edit_time_to]:
+				value = edit.text()
+				if value and not check_number(value):
+					return False
 			return True
 		
 		self.button_box.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(does_validate())
@@ -129,6 +127,17 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 		field_dating = self.combo_dating_mean.currentField()
 		field_dating_uncert = self.combo_dating_uncert.currentField()
 		field_dating_type = self.combo_dating_type.currentField()
+		
+		time_from = self.edit_time_from.text()
+		if time_from:
+			time_from = float(time_from)
+		else:
+			time_from = None
+		time_to = self.edit_time_to.text()
+		if time_to:
+			time_to = float(time_to)
+		else:
+			time_to = None
 		
 		data = dict(
 			upd = dict(
@@ -165,7 +174,7 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			found_data = True
 		
 		if found_data:
-			EDEInterpolationProcess(data, site_duration, site_diameter, time_step, cell_size, self.check_approximate.isChecked(), path_layers, path_summed, layer.crs())
+			EDEInterpolationProcess(data, site_duration, site_diameter, time_step, time_from, time_to, cell_size, self.check_approximate.isChecked(), path_layers, path_summed, layer.crs())
 		
 	def on_input_layer_changed(self, layer):
 		

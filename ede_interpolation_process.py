@@ -38,14 +38,23 @@ def calibrate(age, uncert, curve_conv_age, curve_uncert):
 	sigma_sum = uncert**2 + curve_uncert**2
 	return (np.exp(-(age - curve_conv_age)**2 / (2 * sigma_sum)) / np.sqrt(sigma_sum))
 
+def bp_to_ce(t):
+	
+	t = int(t) - 1950
+	if t > 0:
+		return t, "BCE"
+	return -t, "CE"
+
 class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 	
-	def __init__(self, data, s_duration, s_diameter, time_step, cell_size, approximate, path_layers, path_summed, crs):
+	def __init__(self, data, s_duration, s_diameter, time_step, time_from, time_to, cell_size, approximate, path_layers, path_summed, crs):
 		
 		self.running = True
 		self.s_duration = s_duration
 		self.s_diameter = s_diameter
 		self.time_step = int(time_step)
+		self.time_from = time_from
+		self.time_to = time_to
 		self.cell_size = int(cell_size)
 		self.approximate = approximate
 		self.path_layers = path_layers
@@ -70,6 +79,14 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 	def on_canceled(self):
 		
 		self.running = False
+	
+	def save_summed(self, ts, summed):
+		
+		with open(self.path_summed, "w") as f:
+			f.write("Date_BP,Date_CE,EDE_summed\n")
+			for ti in range(ts.shape[0]):
+				t_ce, cebce = bp_to_ce(ts[ti])
+				f.write("%d,%d %s,%f\n" % (int(ts[ti]), t_ce, cebce, summed[ti]))
 	
 	def save_raster(self, grid, x0, y0, path):
 		
@@ -123,16 +140,25 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 			t_min = min(t_min, (NPD_t_ds - 2*NPD_uncert_ds).min() - self.s_duration)
 			t_max = max(t_max, (NPD_t_ds + 2*NPD_uncert_ds).max() + self.s_duration)
 		t_min, t_max = [int(round(value / 10) * 10) for value in [t_min, t_max]]
-		ts = np.arange(t_min, t_max + self.time_step, self.time_step)  # observed time steps
+		
+		if self.time_from is not None:
+			t_max = min(t_max, self.time_from)
+		if self.time_to is not None:
+			t_min = max(t_min, self.time_to)
+		
+		ts_slices = np.arange(t_max, t_min - 2*self.time_step, -self.time_step).tolist()  # times of time slices
 		
 		# prepare lookup for probability distributions of 14C datings
 		self.setLabelText("Calibrating radiocarbon dates")
 		cal_curve = load_curve(os.path.join(os.path.dirname(__file__), "intcal13.14c")) # [[CalBP, ConvBP, CalSigma], ...], sorted by CalBP
 		
 		# filter calibration curve to include only time-step dates
-		cal_curve = cal_curve[[np.argmin(np.abs(cal_curve[:,0] - t)) for t in ts]]
+		cal_curve = cal_curve[(cal_curve[:,0] >= t_min) & (cal_curve[:,0] <= t_max)][::-1]
+		ts = cal_curve[:,0]
 		curve_conv_age = cal_curve[:,1]
 		curve_uncert = cal_curve[:,2]
+		if ts[-1] < ts_slices[-1]:
+			ts_slices.append(ts[-1])
 		
 		# calculate probability distributions for all combinations of 14c age and uncertainty
 		unique_dates = set()  # ((age, uncert), ...)
@@ -202,7 +228,11 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 		# calculate time-slices
 		self.setLabelText("Generating time-slices")
 		paths = []
+		summed = []
 		val_max = -np.inf
+		grid_summed = np.zeros((height, width), dtype = float)
+		t_slice = ts_slices.pop(0)
+		n_slice = 1
 		for ti in range(ts.shape[0]):
 			QtWidgets.QApplication.processEvents()
 			if not self.running:
@@ -226,21 +256,37 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 				uncert_d = NPD_uncert_ds[idx]
 				A = NPD_As[idx]
 				accur = NPD_accurs[idx]
-				M = 1 - lookup_f_s[accur] * f_t_NPD(ts[ti], t_d, uncert_d, s_halflife, lookup_14c[t_d][uncert_d], ts)
+				M = 1 - lookup_f_s[accur] * f_t_NPD(ts[ti], s_halflife, lookup_14c[t_d][uncert_d], ts)
 				r = int((M.shape[0] - 1) / 2)
 				col0, row0 = np.round((A - [x0, y0]) / self.cell_size - r - 1).astype(int)
 				grid[row0:row0 + M.shape[0],col0:col0 + M.shape[0]] *= M
 			
 			grid = 1 - grid
+			grid[np.isnan(grid)] = 0
+			grid[grid == np.inf] = 0
 			
-			val_max = max(val_max, grid.max())
-			paths.append([ti, os.path.join(self.path_layers, "ede_%03d.tif" % (ti + 1))])
-			self.save_raster(grid, x0, y0, paths[-1][1])
+			summed.append(grid.sum())
 			
+			if ts[ti] <= t_slice:
+				val_max = max(val_max, grid_summed.max())
+				t_ce, cebce = bp_to_ce(t_slice)
+				t_ce2, cebce2 = bp_to_ce(ts_slices[0])
+				datestr = "%03d_%d_%s_-_%d_%s" % (n_slice, t_ce, cebce, t_ce2, cebce2)
+				paths.append([datestr, os.path.join(self.path_layers, "ede_%s.tif" % (datestr))])
+				self.save_raster(grid_summed, x0, y0, paths[-1][1])
+				t_slice = ts_slices.pop(0)
+				n_slice += 1
+				grid_summed[:] = grid
+			else:
+				grid_summed += grid
+		
+		if self.path_summed:
+			self.save_summed(ts, summed)
+		
 		project = QgsProject.instance()
 		val_max = val_max*0.9
-		for ti, path in paths:
-			layer = QgsRasterLayer(path, "EDE_%03d" % (ti + 1))
+		for datestr, path in paths:
+			layer = QgsRasterLayer(path, "EDE_%s" % (datestr))
 			layer.setCrs(self.crs)
 			
 			s = QgsRasterShader()
