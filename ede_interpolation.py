@@ -151,7 +151,7 @@ class EDEInterpolation:
             self.iface.addToolBarIcon(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
+            self.iface.addPluginToRasterMenu(
                 self.menu,
                 action)
 
@@ -176,7 +176,7 @@ class EDEInterpolation:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
+            self.iface.removePluginRasterMenu(
                 self.tr(u'&EDE Interpolation'),
                 action)
             self.iface.removeToolBarIcon(action)

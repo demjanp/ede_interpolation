@@ -2,7 +2,7 @@
 name=EDE Interpolation
 qgisMinimumVersion=3.0
 description=Evidence Density Estimation (EDE) interpolation of archaeological settlement data.
-version=1.0
+version=0.1
 author=Peter Demján
 email=peter.demjan@gmail.com
 
@@ -16,7 +16,6 @@ repository=https://github.com/demjanp/ede_interpolation
 
 # Uncomment the following line and add your changelog:
 # changelog=
-	1.0 : Initial release
 
 # Tags are comma separated with spaces allowed
 tags=Archaeology, Landscape, Spatio-temporal statistics, Settlement area theory, Settlement dynamics, Mathematical modeling, Radiocarbon data
