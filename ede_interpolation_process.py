@@ -1,7 +1,7 @@
 
 from PyQt5 import (QtCore, QtWidgets, QtGui)
 
-from qgis.core import QgsFieldProxyModel, QgsMapLayerProxyModel, QgsRasterLayer, QgsProject, QgsColorRampShader, QgsRasterShader, QgsSingleBandPseudoColorRenderer, QgsColorRamp
+from qgis.core import QgsFieldProxyModel, QgsMapLayerProxyModel, QgsRasterLayer, QgsProject, QgsColorRampShader, QgsRasterShader, QgsSingleBandPseudoColorRenderer, QgsColorRamp, QgsRasterPipe, QgsRasterFileWriter
 from qgis.utils import iface
 
 from .ede_function import *
@@ -47,7 +47,7 @@ def bp_to_ce(t):
 
 class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 	
-	def __init__(self, data, s_duration, s_diameter, time_step, time_from, time_to, cell_size, approximate, path_layers, path_summed, crs):
+	def __init__(self, data, s_duration, s_diameter, time_step, time_from, time_to, cell_size, approximate, path_layers, path_summed, crs, colors):
 		
 		self.running = True
 		self.s_duration = s_duration
@@ -59,11 +59,17 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 		self.approximate = approximate
 		self.path_layers = path_layers
 		self.path_summed = path_summed
+		self.path_rendered = None
 		self.crs = crs
+		self.colors = colors
 		
 		lookup_f_s = {}
 		
 		QtWidgets.QProgressDialog.__init__(self, iface.mainWindow())
+		
+		self.path_rendered = os.path.join(self.path_layers, "rendered")
+		if not os.path.exists(self.path_rendered):
+			os.makedirs(self.path_rendered)
 		
 		self.setWindowTitle("EDE Interpolation")
 		self.setMaximum(100)
@@ -109,6 +115,15 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 		out_raster.SetProjection(self.crs.toWkt())
 		out_raster.GetRasterBand(1).WriteArray(grid)
 		out_raster = None
+	
+	def save_rendered(self, layer, path):
+		
+		self.path_rendered
+		pipe = QgsRasterPipe()
+		pipe.set(layer.dataProvider().clone())
+		pipe.set(layer.renderer().clone())
+		file_writer = QgsRasterFileWriter(path)
+		file_writer.writeRaster(pipe, layer.width(), layer.height(), layer.extent(), layer.crs())
 	
 	def process(self, data):
 		
@@ -231,6 +246,7 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 		summed = []
 		val_max = -np.inf
 		grid_summed = np.zeros((height, width), dtype = float)
+		t_slice_prev = ts_slices.pop(0)
 		t_slice = ts_slices.pop(0)
 		n_slice = 1
 		for ti in range(ts.shape[0]):
@@ -269,11 +285,12 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 			
 			if ts[ti] <= t_slice:
 				val_max = max(val_max, grid_summed.max())
-				t_ce, cebce = bp_to_ce(t_slice)
-				t_ce2, cebce2 = bp_to_ce(ts_slices[0])
+				t_ce, cebce = bp_to_ce(t_slice_prev)
+				t_ce2, cebce2 = bp_to_ce(t_slice)
 				datestr = "%03d_%d_%s_-_%d_%s" % (n_slice, t_ce, cebce, t_ce2, cebce2)
 				paths.append([datestr, os.path.join(self.path_layers, "ede_%s.tif" % (datestr))])
 				self.save_raster(grid_summed, x0, y0, paths[-1][1])
+				t_slice_prev = t_slice
 				t_slice = ts_slices.pop(0)
 				n_slice += 1
 				grid_summed[:] = grid
@@ -285,16 +302,24 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 		
 		project = QgsProject.instance()
 		val_max = val_max*0.9
+		self.setLabelText("Rendering time-slices")
+		cnt = 0
+		cmax = len(paths)
 		for datestr, path in paths:
+			QtWidgets.QApplication.processEvents()
+			if not self.running:
+				return
+			self.setValue((cnt / cmax) * 100)
+			cnt += 1
 			layer = QgsRasterLayer(path, "EDE_%s" % (datestr))
 			layer.setCrs(self.crs)
-			
 			s = QgsRasterShader()
 			c = QgsColorRampShader()
 			c.setColorRampType(QgsColorRampShader.Interpolated)
 			i = [] 
-			i.append(QgsColorRampShader.ColorRampItem(0, QtGui.QColor('#ffffff')))
-			i.append(QgsColorRampShader.ColorRampItem(val_max, QtGui.QColor('#000000')))
+			i.append(QgsColorRampShader.ColorRampItem(0, self.colors[0]))
+			i.append(QgsColorRampShader.ColorRampItem(val_max / 2, self.colors[1]))
+			i.append(QgsColorRampShader.ColorRampItem(val_max, self.colors[2]))
 			c.setColorRampItemList(i)
 			s.setRasterShaderFunction(c)
 			ps = QgsSingleBandPseudoColorRenderer(layer.dataProvider(), 1, s)
@@ -302,4 +327,7 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 			ps.setClassificationMax(val_max)
 			layer.setRenderer(ps)
 			
+			self.save_rendered(layer, os.path.join(self.path_rendered, "%s.tif" % (datestr)))
+			
 			project.addMapLayer(layer)
+

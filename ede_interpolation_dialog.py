@@ -174,7 +174,10 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			found_data = True
 		
 		if found_data:
-			EDEInterpolationProcess(data, site_duration, site_diameter, time_step, time_from, time_to, cell_size, self.check_approximate.isChecked(), path_layers, path_summed, layer.crs())
+			
+			colors = [button.color() for button in [self.color_button_1, self.color_button_2, self.color_button_3]]
+			
+			EDEInterpolationProcess(data, site_duration, site_diameter, time_step, time_from, time_to, cell_size, self.check_approximate.isChecked(), path_layers, path_summed, layer.crs(), colors)
 		
 	def on_input_layer_changed(self, layer):
 		

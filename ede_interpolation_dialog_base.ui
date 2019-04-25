@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>484</width>
-    <height>568</height>
+    <width>516</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -188,24 +188,24 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="8" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
          <string>Save Output Layers to Directory:</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="8" column="1">
        <widget class="QgsFileWidget" name="path_layers"/>
       </item>
-      <item row="7" column="0">
+      <item row="9" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Save Summed Probability to File:</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="1">
+      <item row="9" column="1">
        <widget class="QgsFileWidget" name="file_summed">
         <property name="filter">
          <string>Comma-separated Values (*.csv)</string>
@@ -246,6 +246,78 @@
         </property>
        </widget>
       </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_16">
+        <property name="text">
+         <string>Ramp Color #1:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_17">
+        <property name="text">
+         <string>Ramp Color #2:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_18">
+        <property name="text">
+         <string>Ramp Color #3:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QgsColorButton" name="color_button_1">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="color">
+         <color>
+          <red>68</red>
+          <green>1</green>
+          <blue>84</blue>
+         </color>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QgsColorButton" name="color_button_2">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="color">
+         <color>
+          <red>32</red>
+          <green>146</green>
+          <blue>140</blue>
+         </color>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QgsColorButton" name="color_button_3">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="color">
+         <color>
+          <red>253</red>
+          <green>231</green>
+          <blue>37</blue>
+         </color>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -256,6 +328,13 @@
      </property>
      <property name="openExternalLinks">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_19">
+     <property name="text">
+      <string>&lt;a href=&quot;https://github.com/demjanp/ede_interpolation&quot;&gt;Project Homepage (GitHub)&lt;/a&gt;</string>
      </property>
     </widget>
    </item>
@@ -272,6 +351,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QgsColorButton</class>
+   <extends>QToolButton</extends>
+   <header>qgscolorbutton.h</header>
+  </customwidget>
   <customwidget>
    <class>QgsFieldComboBox</class>
    <extends>QComboBox</extends>
