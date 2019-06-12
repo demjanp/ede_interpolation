@@ -10,6 +10,7 @@ Produces spatio-temporal distribution maps or summed distributions representing 
 Uses radiocarbon-dated as well as typo-chronologically dated evidence as input.
 
 Download: [https://plugins.qgis.org/plugins/ede_interpolation/](https://plugins.qgis.org/plugins/ede_interpolation/)
+
 Wiki: [https://osf.io/v7ahe/wiki/home/](https://osf.io/v7ahe/wiki/home/)
 
 ####Input:
