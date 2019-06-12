@@ -11,22 +11,22 @@ Uses radiocarbon-dated as well as typo-chronologically dated evidence as input.
 
 Download: [https://plugins.qgis.org/plugins/ede_interpolation/](https://plugins.qgis.org/plugins/ede_interpolation/)
 
-Wiki: [https://osf.io/v7ahe/wiki/home/](https://osf.io/v7ahe/wiki/home/)
+Wiki (also contains sample data): [https://osf.io/v7ahe/wiki/home/](https://osf.io/v7ahe/wiki/home/)
 
-####Input:
+#### Input:
 * Shapefile with point data representing evidence of settlement activities (e.g. archaeologically dated components of excavation sites) in a projected coordinate system.
 
-####Required fields for every feature in the source shapefile:
+#### Required fields for every feature in the source shapefile:
 * `Spatial Accuracy (m)` - radius around registered point, where the actual location of the evidence is expected.
 * `Dating Mean (years BP)` - mean value of dating of the archaeological component, representing either a Uniform Probability Distribution (UPD) of calendar years, or a Normal Probability Distribution (NPD) of radiocarbon years.
 * `Dating Uncertainty (years)` - half length of the UPD interval or 1 standard deviation of the radiocarbon age in case of an NPD interval.
 * `Dating Type ('UPD' or 'NPD')` - UPD is a range of calendar years BP (Before Present), assigned to an archaeological period (e.g. a culture), represented here as a mean value and half length of the interval. NPD is a radiocarbon age, represented here as a mean and standard deviation in radiocarbon years BP.
 
-####Model parameters:
+#### Model parameters:
 * `Expected Settlement Duration (years)` - standard length of time that a settlement in the observed time and space is expected to exist, before it moves or in case of typological dating its cultural expression changes.
 * `Expected Settlement Diameter (m)` - standard size of a settlement core. A diameter of 200 m means a settlement of cca 1 ha area.
 
-####Output parameters:
+#### Output parameters:
 * `Time Step (years)` - distribution maps representing probability of presence of evidence of settlement activities at different spatial coordinates will be created at regular intervals in time, specified by this value. Evidence is summed along the time axis for each time step.
 * `Time From (years BP)` - optional parameter specifying the begin of the observed time period.
 * `Time To (years BP)` - optional parameter specifying the end of the observed time period.
