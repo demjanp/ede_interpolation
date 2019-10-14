@@ -38,7 +38,11 @@ Wiki (also contains sample data): [https://osf.io/v7ahe/wiki/home/](https://osf.
 ### Author:
 Peter Demján [peter.demjan@gmail.com](peter.demjan@gmail.com)
 
+Institute of Archaeology of the Czech Academy of Sciences, Prague, v.v.i.
+
 Demján, P., & Dreslerová, D. (2016). Modelling distribution of archaeological settlement evidence based on heterogeneous spatial and temporal data. Journal of Archaeological Science, 69, 100–109. [DOI:10.1016/j.jas.2016.04.003](https://doi.org/10.1016/j.jas.2016.04.003)
+
+Development of this software was supported by OP RDE, MEYS, under the project "Ultra-trace isotope research in social and environmental studies using accelerator mass spectrometry", Reg. No. CZ.02.1.01/0.0/0.0/16_019/0000728.
 
 ## License: <a name="license"></a>
 
