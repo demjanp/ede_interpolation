@@ -11,21 +11,23 @@ Uses radiocarbon-dated as well as typo-chronologically dated evidence as input.
 
 Download: [https://plugins.qgis.org/plugins/ede_interpolation/](https://plugins.qgis.org/plugins/ede_interpolation/)
 
-####Input:
+Wiki (also contains sample data): [https://osf.io/v7ahe/wiki/home/](https://osf.io/v7ahe/wiki/home/)
+
+#### Input:
 * Shapefile with point data representing evidence of settlement activities (e.g. archaeologically dated components of excavation sites) in a projected coordinate system.
 
-####Required fields for every feature in the source shapefile:
+#### Required fields for every feature in the source shapefile:
 * `Spatial Accuracy (m)` - radius around registered point, where the actual location of the evidence is expected.
 * `Dating Mean (years BP)` - mean value of dating of the archaeological component, representing either a Uniform Probability Distribution (UPD) of calendar years, or a Normal Probability Distribution (NPD) of radiocarbon years.
 * `Dating Uncertainty (years)` - half length of the UPD interval or 1 standard deviation of the radiocarbon age in case of an NPD interval.
 * `Dating Type ('UPD' or 'NPD')` - UPD is a range of calendar years BP (Before Present), assigned to an archaeological period (e.g. a culture), represented here as a mean value and half length of the interval. NPD is a radiocarbon age, represented here as a mean and standard deviation in radiocarbon years BP.
 * `Dating Type Fixed As` - specify if all datings are UPD or NPD (instead of using Dating Type field).
 
-####Model parameters:
+#### Model parameters:
 * `Expected Settlement Duration (years)` - standard length of time that a settlement in the observed time and space is expected to exist, before it moves or in case of typological dating its cultural expression changes.
 * `Expected Settlement Diameter (m)` - standard size of a settlement core. A diameter of 200 m means a settlement of cca 1 ha area.
 
-####Output parameters:
+#### Output parameters:
 * `Time Step (years)` - distribution maps representing probability of presence of evidence of settlement activities at different spatial coordinates will be created at regular intervals in time, specified by this value. Evidence is summed along the time axis for each time step.
 * `Time From (years BP)` - optional parameter specifying the begin of the observed time period.
 * `Time To (years BP)` - optional parameter specifying the end of the observed time period.
@@ -37,7 +39,11 @@ Download: [https://plugins.qgis.org/plugins/ede_interpolation/](https://plugins.
 ### Author:
 Peter Demján [peter.demjan@gmail.com](peter.demjan@gmail.com)
 
+Institute of Archaeology of the Czech Academy of Sciences, Prague, v.v.i.
+
 Demján, P., & Dreslerová, D. (2016). Modelling distribution of archaeological settlement evidence based on heterogeneous spatial and temporal data. Journal of Archaeological Science, 69, 100–109. [DOI:10.1016/j.jas.2016.04.003](https://doi.org/10.1016/j.jas.2016.04.003)
+
+Development of this software was supported by OP RDE, MEYS, under the project "Ultra-trace isotope research in social and environmental studies using accelerator mass spectrometry", Reg. No. CZ.02.1.01/0.0/0.0/16_019/0000728.
 
 ## License: <a name="license"></a>
 
