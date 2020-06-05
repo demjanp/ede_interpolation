@@ -19,6 +19,7 @@ Download: [https://plugins.qgis.org/plugins/ede_interpolation/](https://plugins.
 * `Dating Mean (years BP)` - mean value of dating of the archaeological component, representing either a Uniform Probability Distribution (UPD) of calendar years, or a Normal Probability Distribution (NPD) of radiocarbon years.
 * `Dating Uncertainty (years)` - half length of the UPD interval or 1 standard deviation of the radiocarbon age in case of an NPD interval.
 * `Dating Type ('UPD' or 'NPD')` - UPD is a range of calendar years BP (Before Present), assigned to an archaeological period (e.g. a culture), represented here as a mean value and half length of the interval. NPD is a radiocarbon age, represented here as a mean and standard deviation in radiocarbon years BP.
+* `Dating Type Fixed As` - specify if all datings are UPD or NPD (instead of using Dating Type field).
 
 ####Model parameters:
 * `Expected Settlement Duration (years)` - standard length of time that a settlement in the observed time and space is expected to exist, before it moves or in case of typological dating its cultural expression changes.

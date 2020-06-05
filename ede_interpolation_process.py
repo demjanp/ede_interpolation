@@ -265,6 +265,12 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 				M = 1 - lookup_f_s[accur] * f_t_UPD(ts[ti], t_d, uncert_d, s_halflife)
 				r = int((M.shape[0] - 1) / 2)
 				col0, row0 = np.round((A - [x0, y0]) / self.cell_size - r - 1).astype(int)
+				dc = grid.shape[1] - (col0 + M.shape[0])
+				if dc < 0:
+					M = M[:,:dc]
+				dr = grid.shape[0] - (row0 + M.shape[0])
+				if dr < 0:
+					M = M[:dr]
 				grid[row0:row0 + M.shape[0],col0:col0 + M.shape[0]] *= M
 			
 			for idx in range(NPD_t_ds.shape[0]):
@@ -275,6 +281,12 @@ class EDEInterpolationProcess(QtWidgets.QProgressDialog):
 				M = 1 - lookup_f_s[accur] * f_t_NPD(ts[ti], s_halflife, lookup_14c[t_d][uncert_d], ts)
 				r = int((M.shape[0] - 1) / 2)
 				col0, row0 = np.round((A - [x0, y0]) / self.cell_size - r - 1).astype(int)
+				dc = grid.shape[1] - (col0 + M.shape[0])
+				if dc < 0:
+					M = M[:,:dc]
+				dr = grid.shape[0] - (row0 + M.shape[0])
+				if dr < 0:
+					M = M[:dr]
 				grid[row0:row0 + M.shape[0],col0:col0 + M.shape[0]] *= M
 			
 			grid = 1 - grid

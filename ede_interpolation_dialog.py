@@ -60,6 +60,7 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			combo.fieldChanged.connect(self.on_field_changed)
 		for edit in [self.edit_duration, self.edit_diameter, self.edit_time_step, self.edit_time_from, self.edit_time_to, self.edit_cell_size]:
 			edit.textEdited.connect(self.on_text_edited)
+		self.combo_dating_fixed.currentIndexChanged.connect(self.on_field_changed)
 		
 		self.combo_input_layer.layerChanged.connect(self.on_input_layer_changed)
 		self.button_box.accepted.connect(self.on_accept)
@@ -67,14 +68,14 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 		self.update_fields()
 		
 		self.validate()
-		
+	
 	def get_temp_dir(self):
 		
 		tempdir = os.path.normpath(os.path.abspath(os.path.join(tempfile.gettempdir(), "ede_interpolation")))
 		if not os.path.exists(tempdir):
 			os.makedirs(tempdir)
 		return tempdir
-		
+	
 	def update_fields(self):
 		
 		layer = self.combo_input_layer.currentLayer()		
@@ -99,9 +100,11 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			
 			if not self.path_layers.filePath():
 				return False
-			for combo in [self.combo_sp_accuracy, self.combo_dating_mean, self.combo_dating_uncert, self.combo_dating_type]:
+			for combo in [self.combo_sp_accuracy, self.combo_dating_mean, self.combo_dating_uncert]:
 				if not combo.currentField():
 					return False
+			if not ((self.combo_dating_fixed.currentText() != "not fixed") or self.combo_dating_type.currentField()):
+				return False
 			for edit in [self.edit_duration, self.edit_diameter, self.edit_time_step, self.edit_cell_size]:
 				if not check_number(edit.text()):
 					return False
@@ -127,6 +130,10 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 		field_dating = self.combo_dating_mean.currentField()
 		field_dating_uncert = self.combo_dating_uncert.currentField()
 		field_dating_type = self.combo_dating_type.currentField()
+		
+		dating_type_fixed = self.combo_dating_fixed.currentText()
+		if dating_type_fixed == "not fixed":
+			dating_type_fixed = None
 		
 		time_from = self.edit_time_from.text()
 		if time_from:
@@ -156,9 +163,12 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 		found_data = False
 		layer = self.combo_input_layer.currentLayer()
 		for feature in layer.getFeatures():
-			typ = feature[field_dating_type].lower()
-			if typ not in ["upd", "npd"]:
-				continue
+			if dating_type_fixed:
+				typ = dating_type_fixed.lower()
+			else:
+				typ = feature[field_dating_type].lower()
+				if typ not in ["upd", "npd"]:
+					continue
 			if not feature.hasGeometry():
 				continue
 			dating = feature[field_dating]
@@ -178,7 +188,7 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 			colors = [button.color() for button in [self.color_button_1, self.color_button_2, self.color_button_3]]
 			
 			EDEInterpolationProcess(data, site_duration, site_diameter, time_step, time_from, time_to, cell_size, self.check_approximate.isChecked(), path_layers, path_summed, layer.crs(), colors)
-		
+	
 	def on_input_layer_changed(self, layer):
 		
 		self.update_fields()
@@ -186,6 +196,7 @@ class EDEInterpolationDialog(QtWidgets.QDialog, FORM_CLASS):
 	def on_field_changed(self, field):
 		
 		self.validate()
+		self.combo_dating_type.setEnabled(self.combo_dating_fixed.currentText() == "not fixed")
 	
 	def on_text_edited(self, text):
 		

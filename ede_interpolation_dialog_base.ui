@@ -85,6 +85,32 @@
       <item row="4" column="1">
        <widget class="QgsFieldComboBox" name="combo_dating_type"/>
       </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_20">
+        <property name="text">
+         <string>Dating Type Fixed As:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="combo_dating_fixed">
+        <item>
+         <property name="text">
+          <string>not fixed</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>UPD</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>NPD</string>
+         </property>
+        </item>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
